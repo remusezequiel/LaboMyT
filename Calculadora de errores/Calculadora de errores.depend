@@ -1,0 +1,5 @@
+# depslib dependency file v1.0
+1535908063 source:c:\users\ezequ\desktop\calculadora de errores\calculadora de errores\main.c
+	<stdio.h>
+	<stdlib.h>
+
