@@ -8,28 +8,30 @@
 /******DECLARACION*DE*FUNCIONES***********************************************************************/
 float ingresarNumero (void);
 int ingresarOpcion(void);
-float valorMedio(float);
+float valorMedioTresMedidas(float);
 float dispersion(float,float);
 float porcentajeDeDispersion(float,float,float);
+float valorMedio_N_medidas(void);
+float errorAbsoluto(int);
 /*****************************************************************************************************/
 
 /******FUNCION*PRINCIPAL******************************************************************************/
 int main()
 {
     //VARIABLES:
-    float medida;
     int opcion;
+    float medida;
     //ACUMULADORES:
     float maximo=INT_MIN, minimo=INT_MAX, sumaTresMedidas=0;
     //CONTADORES:
     int i;
-
+    int numeroDeMedidas;
 
     //OPCIONES:
     printf("Las siguientes son las opciones para cada operacion: \n");
-    printf("1) Valor medio y dispersion \n");
-
-
+    printf("1) Porcentaje de dispersion. \n");
+    printf("2) Valor medio de (n) cantidad de medidas.\n");
+    printf("3) Error absoluto de la magnitud.\n");
     do
     {
         opcion=ingresarOpcion();
@@ -37,21 +39,21 @@ int main()
         switch(opcion)
         {
             case 1:                             //CASO 1: VALOR MEDIO Y DISPERSION
-                printf("Estas claculando el valor medio y la dispercion de las primeras tres medidas:\n");
-                printf("\nTambien calculamos el porcentaje de dispersion\n");
+                printf("Estas claculando el porcentaje de dispercion\n");
+                printf("\nPrimero deberas ingresar las 3 medidas realizadas.\n");
 
                 for(i=1;i<4;i++)
                 {
                     printf("Ingrese la medida: \n");
                     scanf(" %f", &medida);
 
-                    sumaTresMedidas+=medida;//SUMO LAS MEDIDAS INGRESADAS
+                    sumaTresMedidas+=medida;    //SUMO LAS MEDIDAS INGRESADAS
 
-                    if(medida>maximo)       //CALCULO EL MAXIMO
+                    if(medida>maximo)           //CALCULO EL MAXIMO
                         {
                             maximo=medida;
                         }
-                    if(medida<minimo)       //CALCULO EL MINIMO
+                    if(medida<minimo)           //CALCULO EL MINIMO
                         {
                             minimo=medida;
                         }
@@ -59,14 +61,27 @@ int main()
 
                 printf("maximo: %f\n", maximo);
                 printf("minimo: %f\n", minimo);
-                valorMedio(sumaTresMedidas);
-                dispersion(maximo,minimo);
-                porcentajeDeDispersion(sumaTresMedidas,maximo,minimo);
+                valorMedioTresMedidas(sumaTresMedidas);//llamada a la funcion valor medio
+                dispersion(maximo,minimo);             //llamada a la funcion dispersion
+                porcentajeDeDispersion(sumaTresMedidas,maximo,minimo);//llamada a la funcion porcentajededispersion
+            break;
+            case 2:
+                printf("Estas calculando el valor medio de las (n) cantidad de medidas realizadas \n");
+
+                valorMedio_N_medidas();
+            break;
+            case 3:
+                printf("Estas calculando el error absoluto \n");
+
+                printf("\nIngrese la cantidad de medidas que realizo:\n");
+                scanf(" %d", &numeroDeMedidas);
+
+                errorAbsoluto(numeroDeMedidas);
             break;
         }
         system("pause");
-        system("cls");
-    }while(opcion<2);
+
+    }while(opcion<4);
 
 
     return 0;
@@ -111,7 +126,7 @@ float ingresarNumero(void)
 *\param
 *\return
 *****************************************************************************************************/
-float valorMedio(float sumaTresMedidas)
+float valorMedioTresMedidas(float sumaTresMedidas)
 {
     float valorMedio;
 
@@ -171,7 +186,101 @@ float porcentajeDeDispersion(float sumaTresMedidas,float maximo,float minimo)
     return porcentajeDeDispersion;
 }
 
+/**FUNCION*VALOR*MEDIO*N*MEDIDAS*******************************************************************
+*\brief Solicita la cantidad de medidas a realizar, las acumula, y
+*\param numero de medidas
+*\return valor medio de las n medidas
+*****************************************************************************************************/
 
+float valorMedio_N_medidas(void)
+{
+    int respuesta=1;
+    int numeroDeMedidas=0;
+    float medida,valorMedio,acumulador;
+
+    while(respuesta !=0 )
+    {
+        numeroDeMedidas++;
+
+        printf("Ingrese una medida:\n");
+        scanf(" %f", &medida);
+
+        acumulador += medida;
+
+        printf("Quiere seguir ingresando medidas? (si=1/no=0)");
+        scanf(" %d", &respuesta);
+    }
+
+    printf("\n El valor medio de las n medidas es: %f \n", valorMedio=acumulador/numeroDeMedidas);
+
+    return valorMedio;
+}
+
+/**FUNCION*ERROR*ABSOLUTO****************************************************************************
+*\brief Solicita la cantidad de medidas a realizar y te da a conocer cual sera la operacion a
+*       realizar segun esta cantidad.
+*\param numeroDeMedidas
+*\return errorAbsoluto
+*****************************************************************************************************/
+
+float errorAbsoluto(int numeroDeMedidas)
+{
+    float maximo=INT_MIN, minimo=INT_MAX;
+    int respuesta = 1;
+    float errorAbsoluto, dispersion, sensibilidad, medida, acumulador=0;
+
+    if(numeroDeMedidas==3)
+    {
+        printf("El error absoluto sera el valor de la sensibilidad del aparato utilizado para realizar la medida\n");
+    }
+    else if(numeroDeMedidas>3 && numeroDeMedidas<16)
+    {
+        printf("Ingrese el valor de sensibilidad del aparato:\n");
+        scanf(" %f", &sensibilidad);
+
+        while(respuesta !=0 )
+        {
+            numeroDeMedidas++;
+
+            printf("Ingrese una medida:\n");
+            scanf(" %f", &medida);
+
+            acumulador += medida;
+
+            if(medida>maximo)       //CALCULO EL MAXIMO
+            {
+                maximo=medida;
+            }
+            if(medida<minimo)       //CALCULO EL MINIMO
+            {
+                minimo=medida;
+            }
+
+            printf("Quiere seguir ingresando medidas? (si=1/no=0)\n");
+            scanf(" %d", &respuesta);
+        }
+
+        dispersion = maximo - minimo;
+
+        if((dispersion/4)>sensibilidad)
+        {
+            errorAbsoluto=(dispersion/4);
+        }
+        if((dispersion/4)<sensibilidad)
+        {
+            errorAbsoluto=sensibilidad;
+        }
+
+        printf("\nSensibilidad del aparato = %f\n", maximo);
+        printf("\nMedida maxima = %f\n", maximo);
+        printf("\nMedida minima = %f\n", minimo);
+        printf("\nEl valor de la dispersion = %f\n",dispersion);
+        printf("\nEl error absoluto es: %f\n", errorAbsoluto);
+
+    }
+
+    return errorAbsoluto;
+}
 /******************************************************************************************************/
 
 
